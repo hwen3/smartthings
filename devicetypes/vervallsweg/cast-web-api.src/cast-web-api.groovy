@@ -21,7 +21,6 @@
 metadata {
     definition (name: "cast-web-api", namespace: "vervallsweg", author: "Tobias Haerke") {
         capability "Actuator"
-        capability "Bridge"
         capability "Refresh"
         
         command "checkVersion"
@@ -140,12 +139,7 @@ def createDevices(ids) {
     ids.each {
         if(it!=null&&it!="") {
             logger('debug', "createDevices() adding id: " + it)
-            addChildDevice("vervallsweg", "cast-web-device", it, location.hubs[0].id, [
-                label: "cast-web-device",
-                data: [
-                    "apiHost": getDataValue("apiHost")
-                ]
-            ])
+            addChildDevice("vervallsweg", "cast-web-device", it, ["apiHost": getDataValue("apiHost")])
         }
     }
 }
@@ -159,7 +153,7 @@ def parseListFromString(string) {
 
 def checkVersion() {
     def host = getDataValue("apiHost")
-    sendHubCommand(new physicalgraph.device.HubAction("""GET /config/version HTTP/1.1\r\nHOST: $host\r\n\r\n""", physicalgraph.device.Protocol.LAN, host))
+    sendHubCommand(new hubitat.device.HubAction("""GET /config/version HTTP/1.1\r\nHOST: $host\r\n\r\n""", hubitat.device.Protocol.LAN, host))
 }
 
 

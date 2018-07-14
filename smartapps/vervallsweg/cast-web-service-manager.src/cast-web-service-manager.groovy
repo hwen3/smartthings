@@ -21,10 +21,7 @@ definition(
     category: "SmartThings Labs",
     iconUrl: "https://github.com/vervallsweg/smartthings/raw/master/icn/ic_cast_grey_24dp.png",
     iconX2Url: "https://github.com/vervallsweg/smartthings/raw/master/icn/ic_cast_grey_24dp.png",
-    iconX3Url: "https://github.com/vervallsweg/smartthings/raw/master/icn/ic_cast_grey_24dp.png") {
-    appSetting "api"
-}
-
+    iconX3Url: "https://github.com/vervallsweg/smartthings/raw/master/icn/ic_cast_grey_24dp.png")
 
 preferences {
     page(name: "mainPage")
@@ -84,7 +81,11 @@ def discoveryPage() {
         
         section("Please wait while we discover your Cast devices. Discovery can take five minutes or more, so sit back and relax! Select your device below once discovered.") {
             if(state.devicesMap!=null && state.devicesMap.size()>0) {
-                input "selectedDevices", "enum", required:false, title:"Select Cast Device ("+ state.devicesMap.size() +" found)", multiple:true, options: state.devicesMap
+                def options = [:]
+                state.devicesMap.each {
+                 	options[it.key] = it.value   
+                }
+                input "selectedDevices", "enum", required:false, title:"Select Cast Device ("+ state.devicesMap.size() +" found)", multiple:true, options: options
                 //state.selectedDevicesMap = state.devicesMap
             } else {
                 input "selectedDevices", "enum", required:false, title:"Select Cast Device (0 found)", multiple:true, options: [:]
@@ -122,7 +123,7 @@ def addDevices(selectedDevices) {
             logger('debug', "No cast-web-api installed" )
             
             if(state.latestHttpMac) {
-                addChildDevice("vervallsweg", "cast-web-api", ""+state.latestHttpMac, location.hubs[0].id, [
+                addChildDevice("vervallsweg", "cast-web-api", ""+state.latestHttpMac, null, [
                     "label": "cast-web-api",
                     "data": [
                         "apiHost": apiHostAddress,
@@ -253,10 +254,10 @@ def getDevices() {
 
 def sendHttpRequest(String host, String path) {
     logger('debug', "Executing 'sendHttpRequest' host: "+host+" path: "+path)
-    sendHubCommand(new physicalgraph.device.HubAction("""GET ${path} HTTP/1.1\r\nHOST: $host\r\n\r\n""", physicalgraph.device.Protocol.LAN, host, [callback: hubResponseReceived]))
+    sendHubCommand(new hubitat.device.HubAction("""GET ${path} HTTP/1.1\r\nHOST: $host\r\n\r\n""", hubitat.device.Protocol.LAN, null, [callback: hubResponseReceived]))
 }
 
-void hubResponseReceived(physicalgraph.device.HubResponse hubResponse) {
+void hubResponseReceived(hubResponse) {
     parse(hubResponse.description)
 }
 

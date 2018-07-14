@@ -607,22 +607,22 @@ def apiCall(String path, def dev, def media=null) {
         sendHttpPost(getDataValue('apiHost'), path, media)
         return
     }
-    sendHttpRequest(getDataValue('apiHost'), path)  
+    sendHttpRequest(getDataValue('apiHost'), path) 
 }
 
 def sendHttpRequest(String host, String path, def defaultCallback=hubResponseReceived) {
     logger('debug', "Executing 'sendHttpRequest' host: "+host+" path: "+path)
-    sendHubCommand(new physicalgraph.device.HubAction("""GET ${path} HTTP/1.1\r\nHOST: $host\r\n\r\n""", physicalgraph.device.Protocol.LAN, host, [callback: defaultCallback]))
+    sendHubCommand(new hubitat.device.HubAction("""GET ${path} HTTP/1.1\r\nHOST: $host\r\n\r\n""", hubitat.device.Protocol.LAN, host, [callback: defaultCallback]))
 }
 
 def sendHttpPost(String host, String path, def data) {
     logger('debug', "Executing 'sendHttpPost' host: "+host+" path: "+path+" data: "+data+" data.length():"+data.length()+1)
-    def ha = new physicalgraph.device.HubAction("""POST ${path} HTTP/1.1\r\nHOST: $host\r\nContent-Length:${data.length()+1}\r\n\r\n ${data}""", physicalgraph.device.Protocol.LAN, host, [callback: hubResponseReceived])
+    def ha = new hubitat.device.HubAction("""POST ${path} HTTP/1.1\r\nHOST: $host\r\nContent-Length:${data.length()+1}\r\n\r\n ${data}""", hubitat.device.Protocol.LAN, host, [callback: hubResponseReceived])
     logger('debug', "HubAction: "+ha)
     sendHubCommand(ha)
 }
 
-void hubResponseReceived(physicalgraph.device.HubResponse hubResponse) {
+void hubResponseReceived(hubResponse) {
     parse(hubResponse.description)
 }
 
